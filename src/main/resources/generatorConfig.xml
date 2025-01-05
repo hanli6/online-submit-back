@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+  <context id="MySQLTables" targetRuntime="MyBatis3">
+    <!-- MySQL JDBC 连接 -->
+    <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                    connectionURL="jdbc:mysql://localhost:3306/db_boot_manuscript"
+                    userId="root"
+                    password="yzk">
+      <!-- 仅查询当前库的表，不去查询其他库 -->
+      <property name="nullCatalogMeansCurrent" value="true" />
+      <property name="remarksReporting" value="true"/>
+    </jdbcConnection>
+
+    <javaTypeResolver>
+      <property name="forceBigDecimals" value="false" />
+    </javaTypeResolver>
+
+    <!-- 生成 Java Model 类 -->
+    <javaModelGenerator targetPackage="cloud.icode.onlinesubmit.model" targetProject="src\main\java">
+      <property name="enableSubPackages" value="true" />
+      <property name="trimStrings" value="true" />
+    </javaModelGenerator>
+
+    <!-- 生成 MyBatis SQL 映射文件 -->
+    <sqlMapGenerator targetPackage="mybatis" targetProject="src\main\resources">
+      <property name="enableSubPackages" value="true" />
+    </sqlMapGenerator>
+
+    <!-- 生成 MyBatis Mapper 接口 -->
+    <javaClientGenerator type="XMLMAPPER" targetPackage="cloud.icode.onlinesubmit.dao" targetProject="src\main\java">
+      <property name="enableSubPackages" value="true" />
+    </javaClientGenerator>
+
+    <!-- 配置需要生成的表 -->
+    <table schema="db_boot_manuscript" tableName="user" domainObjectName="User">
+      <!-- 启用驼峰命名规则 -->
+      <property name="useActualColumnNames" value="false" />
+    </table>
+
+  </context>
+</generatorConfiguration>

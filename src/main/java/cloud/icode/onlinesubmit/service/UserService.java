@@ -1,6 +1,7 @@
 package cloud.icode.onlinesubmit.service;
 
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
+import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
 import cloud.icode.onlinesubmit.model.vo.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,4 +21,6 @@ public interface UserService {
      * @return
      */
     UserVo userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request);
+
+    int registerUser(UserRegisterRequest userRegisterRequest);
 }

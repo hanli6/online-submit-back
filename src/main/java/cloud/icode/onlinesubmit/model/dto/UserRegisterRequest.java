@@ -1,5 +1,7 @@
 package cloud.icode.onlinesubmit.model.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -10,6 +12,7 @@ import javax.validation.constraints.*;
  * 文件描述: UserLoginRequest
  */
 @Data
+@ApiModel(description = "用户注册请求体")
 public class UserRegisterRequest {
     /**
      *
@@ -20,6 +23,7 @@ public class UserRegisterRequest {
      */
     @NotNull(message = "昵称不能为空")
     //@Pattern(regexp = UserConstant.ILLEGAL_CHARACTER)
+    @ApiModelProperty(name = "昵称",required = true)
     private String nickname;
 
     /**
@@ -31,6 +35,7 @@ public class UserRegisterRequest {
      */
     @NotNull(message = "用户名不能为空")
     //@Pattern(regexp = UserConstant.ILLEGAL_CHARACTER)
+    @ApiModelProperty(name = "用户名",required = true)
     private String username;
 
     /**
@@ -42,10 +47,12 @@ public class UserRegisterRequest {
      */
     @NotNull(message = "密码不能为空")
     @Size(min = 6,max = 16,message = "长度不符合规范")
+    @ApiModelProperty(name = "密码",required = true)
     private String password;
 
     @NotNull(message = "密码不能为空")
     @Size(min = 6,max = 16,message = "长度不符合规范")
+    @ApiModelProperty(name = "确认密码",required = true)
     private String requirePassword;
 
 
@@ -57,6 +64,7 @@ public class UserRegisterRequest {
      * @mbg.generated Sun Jan 05 14:43:58 CST 2025
      */
     @Email(message = "不符合邮箱格式")
+    @ApiModelProperty(name = "邮箱",required = true)
     private String email;
 
     /**
@@ -68,6 +76,7 @@ public class UserRegisterRequest {
      */
     @NotNull(message = "手机号不能为空")
     @Size(min = 11,max = 11)
+    @ApiModelProperty(name = "手机号",required = true)
     private String mobile;
 
     /**
@@ -78,6 +87,7 @@ public class UserRegisterRequest {
      * @mbg.generated Sun Jan 05 14:43:58 CST 2025
      */
     @NotNull(message = "地址不能为空")
+    @ApiModelProperty(name = "地址",required = true)
     private String address;
 
     /**
@@ -90,6 +100,7 @@ public class UserRegisterRequest {
     @NotNull(message = "角色信息不能为空")
     @Min(value = 0,message = "角色信息不对")
     @Max(value = 3,message = "角色信息不对")
+    @ApiModelProperty(name = "用户类型",required = true)
     private Integer role;
 
 }

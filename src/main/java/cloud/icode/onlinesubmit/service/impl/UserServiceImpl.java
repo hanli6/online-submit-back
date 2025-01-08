@@ -2,6 +2,8 @@ package cloud.icode.onlinesubmit.service.impl;
 
 import cloud.icode.onlinesubmit.constant.UserConstant;
 import cloud.icode.onlinesubmit.dao.UserMapper;
+import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
+import cloud.icode.onlinesubmit.exception.CustomException;
 import cloud.icode.onlinesubmit.model.User;
 import cloud.icode.onlinesubmit.model.UserExample;
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
@@ -32,12 +34,14 @@ public class UserServiceImpl implements UserService {
     public UserVo userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
         //数据校验
         if (userLoginRequest == null) {
-            return null;
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
         }
+
+        //查询用户
         String username = userLoginRequest.getUsername();
         String password = userLoginRequest.getPassword();
         if(StringUtils.isAnyEmpty(username,password)){
-            return null;
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
         }
 
         //数据库查询
@@ -47,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList = userMapper.selectByExample(userExample);
         if (userList == null || userList.isEmpty()) {
-            return null;
+            throw new CustomException(AppHttpCodeEnum.USER_DATA_NOT_EXIST);
         }
         User user = userList.get(0);
         UserVo userVo = BeanUtil.copyProperties(user, UserVo.class);
@@ -70,7 +74,7 @@ public class UserServiceImpl implements UserService {
         userExample.createCriteria().andUsernameEqualTo(userRegisterRequest.getUsername());
         List<User> userList = userMapper.selectByExample(userExample);
         if (!(userList == null || userList.isEmpty())) {
-            return -1;
+            throw new CustomException(AppHttpCodeEnum.USER_EXIST);
         }
 
         //密码进行加密

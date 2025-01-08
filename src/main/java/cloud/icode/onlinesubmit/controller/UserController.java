@@ -6,6 +6,8 @@ import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
 import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
 import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,16 +23,13 @@ import javax.validation.Valid;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @CrossOrigin(origins = {"http://localhost:8081"}, allowCredentials = "true")
+@Api(tags = "用户模块")
 public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
+    @ApiOperation(value = "用户登录")
     public ResponseResult login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        //参数校验
-        if (request == null) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
-        }
-
         //封装数据
         UserVo userVo = userService.userLogin(userLoginRequest, request);
         if (userVo == null) {
@@ -41,6 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
+    @ApiOperation(value = "用户注册")
     public ResponseResult register(@Valid @RequestBody UserRegisterRequest userRegisterRequest) {
         //参数校验
         if (userRegisterRequest == null) {

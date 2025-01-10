@@ -1,5 +1,6 @@
 package cloud.icode.onlinesubmit.controller;
 
+import cloud.icode.onlinesubmit.annoation.Log;
 import cloud.icode.onlinesubmit.common.ResponseResult;
 import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
@@ -22,13 +23,14 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8081"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8080"}, allowCredentials = "true")
 @Api(tags = "用户模块")
 public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录")
+    @Log(name = "用户登录模块")
     public ResponseResult login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         //封装数据
         UserVo userVo = userService.userLogin(userLoginRequest, request);
@@ -41,6 +43,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ApiOperation(value = "用户注册")
+    @Log(name = "用户注册模块")
     public ResponseResult register(@Valid @RequestBody UserRegisterRequest userRegisterRequest) {
         //参数校验
         if (userRegisterRequest == null) {

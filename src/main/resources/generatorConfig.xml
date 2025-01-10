@@ -37,9 +37,7 @@
     </javaClientGenerator>
 
     <!-- 配置需要生成的表 -->
-    <table schema="db_boot_manuscript" tableName="user" domainObjectName="User">
-      <!-- 启用驼峰命名规则 -->
-      <property name="useActualColumnNames" value="false" />
+    <table schema="db_boot_manuscript" tableName="operate_log" domainObjectName="OperateLog">
     </table>
 
   </context>

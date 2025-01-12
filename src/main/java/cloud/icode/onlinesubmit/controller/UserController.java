@@ -5,7 +5,6 @@ import cloud.icode.onlinesubmit.common.ResponseResult;
 import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
 import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
-import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Map;
 
 /**
  * 作者: 杨振坤
@@ -33,12 +33,9 @@ public class UserController {
     @Log(name = "用户登录模块")
     public ResponseResult login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         //封装数据
-        UserVo userVo = userService.userLogin(userLoginRequest, request);
-        if (userVo == null) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST);
-        }
+        Map<String, Object> result = userService.userLogin(userLoginRequest, request);
 
-        return ResponseResult.okResult(userVo);
+        return ResponseResult.okResult(result);
     }
 
     @PostMapping("/register")

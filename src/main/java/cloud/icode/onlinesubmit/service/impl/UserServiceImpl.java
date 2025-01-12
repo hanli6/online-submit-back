@@ -1,13 +1,18 @@
 package cloud.icode.onlinesubmit.service.impl;
 
+import cloud.icode.onlinesubmit.common.CommonConstant;
 import cloud.icode.onlinesubmit.constant.UserConstant;
+import cloud.icode.onlinesubmit.dao.MenuMapper;
 import cloud.icode.onlinesubmit.dao.UserMapper;
 import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
 import cloud.icode.onlinesubmit.exception.CustomException;
+import cloud.icode.onlinesubmit.model.Menu;
+import cloud.icode.onlinesubmit.model.MenuExample;
 import cloud.icode.onlinesubmit.model.User;
 import cloud.icode.onlinesubmit.model.UserExample;
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
 import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
+import cloud.icode.onlinesubmit.model.vo.MenuVo;
 import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.UserService;
 import cn.hutool.core.bean.BeanUtil;
@@ -17,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.*;
 
 /**
  * 作者: 杨振坤
@@ -29,9 +34,10 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
+    private final MenuMapper menuMapper;
 
     @Override
-    public UserVo userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public Map<String, Object> userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
         //数据校验
         if (userLoginRequest == null) {
             throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
@@ -40,12 +46,12 @@ public class UserServiceImpl implements UserService {
         //查询用户
         String username = userLoginRequest.getUsername();
         String password = userLoginRequest.getPassword();
-        if(StringUtils.isAnyEmpty(username,password)){
+        if (StringUtils.isAnyEmpty(username, password)) {
             throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
         }
 
         //数据库查询
-        UserExample userExample=new UserExample();
+        UserExample userExample = new UserExample();
         userExample.createCriteria().andUsernameEqualTo(username)
                 .andPasswordEqualTo(DigestUtils.md5DigestAsHex((UserConstant.SALT + password).getBytes()));
 
@@ -56,9 +62,45 @@ public class UserServiceImpl implements UserService {
         User user = userList.get(0);
         UserVo userVo = BeanUtil.copyProperties(user, UserVo.class);
 
+        //获取当前登录用户菜单树
+        MenuExample menuExample = new MenuExample();
+        menuExample.createCriteria().andUserIdEqualTo(user.getId())
+                .andIsDeleteEqualTo(CommonConstant.NO_DELETE);
+        List<Menu> menus = menuMapper.selectByExample(menuExample);
+
+        //获取一级菜单,将其存储在menuList中
+        List<MenuVo> menuVoList = new ArrayList<>();
+        menus.stream().forEach(menu -> {
+            if (menu.getParentId() == null) {
+                MenuVo menuVo = BeanUtil.copyProperties(menu, MenuVo.class);
+                menuVoList.add(menuVo);
+            }
+        });
+
+        //将二级菜单存储在一级菜单的子菜单属性下
+        menuVoList.stream().forEach(menuVo -> {
+            //过滤出子菜单，将子菜单赋值给父菜单的Children属性
+            menus.stream().filter(menuFilter -> {
+                return menuFilter.getParentId() != null;
+            }).forEach(menuChildren -> {
+                if (Objects.equals(menuVo.getId(), menuChildren.getParentId())) {
+                    if (menuVo.getChildren() == null) {
+                        menuVo.setChildren(new ArrayList<>());
+                    }
+                    MenuVo menuVoChildren = BeanUtil.copyProperties(menuChildren, MenuVo.class);
+                    menuVo.getChildren().add(menuVoChildren);
+                }
+            });
+        });
+
+        //整和数据
+        Map<String, Object> result = new HashMap<>();
+        result.put("userVo", userVo);
+        result.put("menuVoList", menuVoList);
+
         //将用户信息存储在Session中
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE,userVo);
-        return userVo;
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, userVo);
+        return result;
     }
 
     /**

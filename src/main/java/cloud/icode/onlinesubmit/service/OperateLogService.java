@@ -1,6 +1,9 @@
 package cloud.icode.onlinesubmit.service;
 
 import cloud.icode.onlinesubmit.model.OperateLog;
+import cloud.icode.onlinesubmit.model.vo.OperateLogVo;
+
+import java.util.List;
 
 /**
  * 作者: 杨振坤
@@ -15,4 +18,6 @@ public interface OperateLogService {
      * @return
      */
     public int saveLog(OperateLog operateLog);
+
+    public List<OperateLogVo> operateLogList();
 }

@@ -7,6 +7,7 @@ import cloud.icode.onlinesubmit.exception.CustomException;
 import cloud.icode.onlinesubmit.model.OperateLog;
 import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.OperateLogService;
+import cn.hutool.core.date.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -83,7 +84,7 @@ public class SystemLog {
         operateLog.setIpAddr(remoteAddr);
 
         //处理时间
-        log.info("处理时间：{}", new Date());
+        log.info("处理时间：{}", DateUtil.now());
         operateLog.setRequestTime(new Date());
 
         //用户登录信息

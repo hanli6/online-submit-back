@@ -1,12 +1,20 @@
 package cloud.icode.onlinesubmit.service.impl;
 
+import cloud.icode.onlinesubmit.common.CommonConstant;
 import cloud.icode.onlinesubmit.dao.OperateLogMapper;
 import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
 import cloud.icode.onlinesubmit.exception.CustomException;
 import cloud.icode.onlinesubmit.model.OperateLog;
+import cloud.icode.onlinesubmit.model.OperateLogExample;
+import cloud.icode.onlinesubmit.model.vo.OperateLogVo;
 import cloud.icode.onlinesubmit.service.OperateLogService;
+import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 作者: 杨振坤
@@ -33,4 +41,33 @@ public class operateLogServiceImpl implements OperateLogService {
         }
         return count;
     }
+
+    /**
+     * 查询日志列表
+     *
+     * @return
+     */
+    @Override
+    public List<OperateLogVo> operateLogList() {
+        //获取日志
+        OperateLogExample example = new OperateLogExample();
+        example.createCriteria().andIsDeleteEqualTo(CommonConstant.NO_DELETE);
+        example.setOrderByClause("id desc limit 8");
+        List<OperateLog> operateLogs = operateLogMapper.selectByExample(example);
+
+        //返回结果
+        List<OperateLogVo> result = new ArrayList<OperateLogVo>();
+        if (operateLogs == null || operateLogs.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            operateLogs.forEach(item -> {
+                OperateLogVo operateLogVo = BeanUtil.copyProperties(item, OperateLogVo.class);
+                result.add(operateLogVo);
+            });
+        }
+
+        return result;
+    }
+
+
 }

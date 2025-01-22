@@ -37,8 +37,9 @@
     </javaClientGenerator>
 
     <!-- 配置需要生成的表 -->
-    <table schema="db_boot_manuscript" tableName="menu" domainObjectName="Menu">
+    <table schema="db_boot_manuscript" tableName="manuscript" domainObjectName="Manuscript">
     </table>
+
 
   </context>
 </generatorConfiguration>

@@ -10,8 +10,6 @@ import java.io.Serializable;
  */
 public class ResponseResult<T> implements Serializable {
 
-    private String host;
-
     private Integer code;
 
     private String message;
@@ -118,14 +116,6 @@ public class ResponseResult<T> implements Serializable {
 
     public void setData(T data) {
         this.data = data;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
     }
 
 

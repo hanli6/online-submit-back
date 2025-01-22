@@ -20,7 +20,7 @@ public class interceptorConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         String[] exclude = new String[]{
-                "/user/login/", "/user/register",
+                "/user/login", "/user/register",
                 "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/api", "/api-docs", "/api-docs/**", "/doc.html/**"
         };
         registry.addInterceptor(onlineSubmitInterceptor)

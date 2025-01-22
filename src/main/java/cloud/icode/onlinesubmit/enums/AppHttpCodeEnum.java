@@ -32,7 +32,13 @@ public enum AppHttpCodeEnum {
     MATERIAL_REFERENCE_FALL(3501,"素材引用失效"),
 
     //用户信息
-    USER_EXIST(1003,"用户已经存在");
+    USER_EXIST(1003,"用户已经存在"),
+
+    //稿件
+    FILE_UPLOAD_AT_LEAST_TWO(1004,"至少上传两个文件"),
+    FILE_SIZE_ERROR(1005,"文件大小不符合"),
+    FILE_SUFFIX_ERROR(1006,"文件格式不符合！"),
+    ;
 
     int code;
     String message;

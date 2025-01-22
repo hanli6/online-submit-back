@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
     private final MenuMapper menuMapper;
 
     @Override
-    public Map<String, Object> userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public Map<String, Object> userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request, HttpServletResponse response) {
         //数据校验
         if (userLoginRequest == null) {
             throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
@@ -53,7 +54,8 @@ public class UserServiceImpl implements UserService {
         //数据库查询
         UserExample userExample = new UserExample();
         userExample.createCriteria().andUsernameEqualTo(username)
-                .andPasswordEqualTo(DigestUtils.md5DigestAsHex((UserConstant.SALT + password).getBytes()));
+                .andPasswordEqualTo(DigestUtils.md5DigestAsHex((UserConstant.SALT + password).getBytes()))
+                .andIsDeleteEqualTo(CommonConstant.NO_DELETE);
 
         List<User> userList = userMapper.selectByExample(userExample);
         if (userList == null || userList.isEmpty()) {
@@ -98,8 +100,11 @@ public class UserServiceImpl implements UserService {
         result.put("userVo", userVo);
         result.put("menuVoList", menuVoList);
 
-        //将用户信息存储在Session中
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, userVo);
+        //将用户信息存储在token中
+//        String token = AppJwtUtil.getToken(user.getId());
+//        result.put("token", token);
+        //将用户信息存储在session中
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE,userVo);
         return result;
     }
 

@@ -15,5 +15,13 @@ spring:
 mybatis:
   mapper-locations: /mybatis/*.xml
 
-
+# 稿件属性配置
+file:
+  upload:
+    max: 2097152
+    min: 1
+  manuscript:
+    suffix: pdf,doc,docx
+  img:
+    suffix: png,jpg,pdf,jpeg
 

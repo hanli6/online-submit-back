@@ -4,6 +4,7 @@ import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
 import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -20,7 +21,7 @@ public interface UserService {
      * @param request
      * @return
      */
-    Map<String,Object> userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request);
+    Map<String,Object> userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request, HttpServletResponse response);
 
     int registerUser(UserRegisterRequest userRegisterRequest);
 }

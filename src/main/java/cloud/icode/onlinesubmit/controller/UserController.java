@@ -2,9 +2,12 @@ package cloud.icode.onlinesubmit.controller;
 
 import cloud.icode.onlinesubmit.annoation.Log;
 import cloud.icode.onlinesubmit.common.ResponseResult;
+import cloud.icode.onlinesubmit.constant.UserConstant;
 import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
+import cloud.icode.onlinesubmit.exception.CustomException;
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
 import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
+import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -23,7 +27,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080"}, allowCredentials = "true")
 @Api(tags = "用户模块")
 public class UserController {
     private final UserService userService;
@@ -31,9 +34,9 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation(value = "用户登录")
     @Log(name = "用户登录模块")
-    public ResponseResult login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public ResponseResult login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request, HttpServletResponse response) {
         //封装数据
-        Map<String, Object> result = userService.userLogin(userLoginRequest, request);
+        Map<String, Object> result = userService.userLogin(userLoginRequest, request, response);
 
         return ResponseResult.okResult(result);
     }
@@ -53,6 +56,23 @@ public class UserController {
         }
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @GetMapping("/getCurrentUser")
+    @ApiOperation(value = "获取当前登录用户")
+    @Log(name = "获取当前登录用户")
+    public ResponseResult getCurrentUser(HttpServletRequest request) {
+        //参数校验
+        if (request == null) {
+            throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
+        }
+
+        //从session中获取用户信息
+        UserVo userVo = (UserVo) request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        if (userVo == null) {
+            return ResponseResult.okResult(null);
+        }
+        return ResponseResult.okResult(userVo);
     }
 
 }

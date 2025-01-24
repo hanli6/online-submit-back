@@ -2,6 +2,7 @@ package cloud.icode.onlinesubmit.service;
 
 import cloud.icode.onlinesubmit.model.dto.UserLoginRequest;
 import cloud.icode.onlinesubmit.model.dto.UserRegisterRequest;
+import cloud.icode.onlinesubmit.model.vo.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,4 +25,11 @@ public interface UserService {
     Map<String,Object> userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request, HttpServletResponse response);
 
     int registerUser(UserRegisterRequest userRegisterRequest);
+
+    /**
+     * 查询用户信息
+     * @param userId
+     * @return
+     */
+    UserVo getUserInfo(Long userId);
 }

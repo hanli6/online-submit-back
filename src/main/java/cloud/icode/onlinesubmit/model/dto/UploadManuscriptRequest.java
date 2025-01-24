@@ -1,10 +1,14 @@
 package cloud.icode.onlinesubmit.model.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
+@ApiModel(description = "用户上传文稿请求体")
 public class UploadManuscriptRequest {
 
     /**
@@ -13,6 +17,8 @@ public class UploadManuscriptRequest {
      *
      * @mbg.generated Fri Jan 17 12:27:05 CST 2025
      */
+    @ApiModelProperty(name = "标题",required = true)
+    @NotNull(message = "标题不能为空")
     private String title;
 
     /**
@@ -21,6 +27,8 @@ public class UploadManuscriptRequest {
      *
      * @mbg.generated Fri Jan 17 12:27:05 CST 2025
      */
+    @ApiModelProperty(name = "描述",required = true)
+    @NotNull(message = "描述不能为空")
     private String description;
 
     /**
@@ -39,7 +47,11 @@ public class UploadManuscriptRequest {
      */
     private Integer status;
 
+    @ApiModelProperty(name = "日期",required = true)
+    @NotNull(message = "日期不能为空")
     private Date date;
+    @ApiModelProperty(name = "时间",required = true)
+    @NotNull(message = "时间不能为空")
     private Date time;
 
     /**
@@ -48,6 +60,7 @@ public class UploadManuscriptRequest {
      *
      * @mbg.generated Fri Jan 17 12:27:05 CST 2025
      */
+    @ApiModelProperty(name = "稿件封面",required = true)
     private String coverImg;
 
     /**
@@ -56,5 +69,6 @@ public class UploadManuscriptRequest {
      *
      * @mbg.generated Fri Jan 17 12:27:05 CST 2025
      */
+    @ApiModelProperty(name = "稿件文件",required = true)
     private String manuscriptFile;
 }

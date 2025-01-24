@@ -18,6 +18,8 @@ import cloud.icode.onlinesubmit.service.UserService;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -34,6 +36,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserMapper userMapper;
     private final MenuMapper menuMapper;
 
@@ -104,7 +107,7 @@ public class UserServiceImpl implements UserService {
 //        String token = AppJwtUtil.getToken(user.getId());
 //        result.put("token", token);
         //将用户信息存储在session中
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE,userVo);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, userVo);
         return result;
     }
 
@@ -131,5 +134,26 @@ public class UserServiceImpl implements UserService {
         User user = BeanUtil.copyProperties(userRegisterRequest, User.class);
         user.setPassword(md5DigestAsHex);
         return userMapper.insertSelective(user);
+    }
+
+    /**
+     * 查询用户信息
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public UserVo getUserInfo(Long userId) {
+        //参数校验
+        if (userId == null) {
+            return null;
+        }
+
+        //查询用户信息
+        User user = userMapper.selectByPrimaryKey(userId);
+        if (user == null) {
+            return null;
+        }
+        return BeanUtil.copyProperties(user, UserVo.class);
     }
 }

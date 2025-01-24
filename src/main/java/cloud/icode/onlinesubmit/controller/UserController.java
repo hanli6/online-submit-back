@@ -41,6 +41,25 @@ public class UserController {
         return ResponseResult.okResult(result);
     }
 
+    @PostMapping("/logout")
+    @ApiOperation(value = "用户推出")
+    @Log(name = "用户退出模块")
+    public ResponseResult login(HttpServletRequest request) {
+        //参数校验
+        if (request == null) {
+            throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
+        }
+        //清空session中的用户数据
+        UserVo userVo = (UserVo) request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        //用户数据不存在
+        if (userVo == null) {
+            return ResponseResult.okResult(true);
+        }
+        //用户数据存在=》清除数据
+        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
+        return ResponseResult.okResult(true);
+    }
+
     @PostMapping("/register")
     @ApiOperation(value = "用户注册")
     @Log(name = "用户注册模块")
@@ -50,6 +69,7 @@ public class UserController {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
         }
 
+        //查询用户数据
         int count = userService.registerUser(userRegisterRequest);
         if (count == -1) {
             return ResponseResult.errorResult(AppHttpCodeEnum.DATA_EXIST);

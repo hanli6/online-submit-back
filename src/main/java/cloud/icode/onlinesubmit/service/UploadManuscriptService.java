@@ -1,5 +1,6 @@
 package cloud.icode.onlinesubmit.service;
 
+import cloud.icode.onlinesubmit.common.ResponseResult;
 import cloud.icode.onlinesubmit.model.dto.UploadManuscriptRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +20,10 @@ public interface UploadManuscriptService {
      * @return
      */
     public boolean uploadManuscript(MultipartFile[] file, UploadManuscriptRequest request, HttpServletRequest httpServletRequest);
+
+    /**
+     * 查询稿件列表
+     * @return
+     */
+    ResponseResult listManuscripts();
 }

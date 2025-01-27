@@ -4,15 +4,16 @@ import cloud.icode.onlinesubmit.common.CommonConstant;
 import cloud.icode.onlinesubmit.common.ResponseResult;
 import cloud.icode.onlinesubmit.dao.ManuscriptMapper;
 import cloud.icode.onlinesubmit.enums.AppHttpCodeEnum;
+import cloud.icode.onlinesubmit.enums.ManuscriptEnum;
 import cloud.icode.onlinesubmit.exception.CustomException;
 import cloud.icode.onlinesubmit.model.Manuscript;
 import cloud.icode.onlinesubmit.model.ManuscriptExample;
-import cloud.icode.onlinesubmit.model.ManuscriptWithBLOBs;
 import cloud.icode.onlinesubmit.model.dto.UploadManuscriptRequest;
 import cloud.icode.onlinesubmit.model.vo.ManuscriptVo;
 import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.UploadManuscriptService;
 import cloud.icode.onlinesubmit.service.UserService;
+import cloud.icode.onlinesubmit.utils.ToolUtils;
 import cloud.icode.onlinesubmit.utils.UserContext;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +51,8 @@ public class UploadManuscriptServiceImpl implements UploadManuscriptService {
     private String fileManuscriptSuffix;
     @Value("${file.img.suffix}")
     private String fileImgSuffix;
+    @Value("${file.upload.path}")
+    private String fileUploadPath;
 
     private final ManuscriptMapper manuscriptMapper;
     private final UserService userService;
@@ -62,60 +65,76 @@ public class UploadManuscriptServiceImpl implements UploadManuscriptService {
         }
         //校验文件大小
         MultipartFile imgFile = file[0];
-        MultipartFile manuscriptFile = file[1];
         long imgFileSize = imgFile.getSize();
-        long manuscriptFileSize = manuscriptFile.getSize();
         long maxSize = Long.parseLong(uploadManuscriptMaxSize);
         long minSize = Long.parseLong(uploadManuscriptMinSize);
         if (imgFileSize > maxSize || imgFileSize < minSize) {
             throw new CustomException(AppHttpCodeEnum.FILE_SIZE_ERROR);
         }
-        if (manuscriptFileSize > maxSize || manuscriptFileSize < minSize) {
-            throw new CustomException(AppHttpCodeEnum.FILE_SIZE_ERROR);
-        }
         //校验文件格式
         String imgFileName = imgFile.getOriginalFilename();
-        String manuscriptFileName = manuscriptFile.getOriginalFilename();
-        if (StrUtil.isBlank(imgFileName) || StrUtil.isBlank(manuscriptFileName)) {
-            throw new CustomException(AppHttpCodeEnum.FILE_SUFFIX_ERROR);
-        }
-
-        String imgSuffix = StrUtil.subSuf(imgFileName, imgFileName.indexOf(".") + 1);
-        String manuscriptSuffix = StrUtil.subSuf(manuscriptFileName, manuscriptFileName.indexOf(".") + 1);
-        if (!(fileImgSuffix.contains(imgSuffix) && fileManuscriptSuffix.contains(manuscriptSuffix))) {
+        if (StrUtil.isBlank(imgFileName)) {
             throw new CustomException(AppHttpCodeEnum.FILE_SUFFIX_ERROR);
         }
 
         //将文件转换为Base64存储在数据库中
-        String imgStr = "";
-        String manuscriptStr = "";
+        Manuscript manuscript = BeanUtil.copyProperties(request, Manuscript.class);
+        String imgSuffix = StrUtil.subSuf(imgFileName, imgFileName.indexOf(".") + 1);
+        //文档文件
+        MultipartFile multipartFile = null;
         try {
-            imgStr = Base64.encode(imgFile.getBytes());
-            manuscriptStr = Base64.encode(manuscriptFile.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (fileImgSuffix.contains(imgSuffix)) {
+                multipartFile = file[1];
+                manuscript.setCoverImg(Base64.encode(file[0].getBytes()));
+            } else {
+                multipartFile = file[0];
+                manuscript.setCoverImg(Base64.encode(file[1].getBytes()));
+            }
+        } catch (Exception e) {
+            log.info("error is {}", e.getMessage());
         }
-        //组装数据
-        //剩余数据自动填充
-        ManuscriptWithBLOBs manuscriptWithBLOBs = BeanUtil.copyProperties(request, ManuscriptWithBLOBs.class);
-        manuscriptWithBLOBs.setCoverImg(imgStr);
-        manuscriptWithBLOBs.setManuscriptFile(manuscriptStr);
+
+        //获取文档名称
+        String filename = null;
+        if (multipartFile != null) {
+            filename = multipartFile.getOriginalFilename();
+        }
+        if (StrUtil.isBlank(filename)) {
+            throw new CustomException(AppHttpCodeEnum.FILE_NAME_IS_NOT_EMPTY);
+        }
+        //文件夹不存在就创建
+        File saveFile = new File(fileUploadPath+ToolUtils.getYYYYMMddString());
+        if (!saveFile.exists()) {
+            saveFile.mkdir();
+        }
+
+        //设置文件路径
+        String filePath = fileUploadPath + ToolUtils.getYYYYMMddString() + "/" + filename;
+        //保存文件
+        try {
+            multipartFile.transferTo(new File(filePath));
+        } catch (Exception e) {
+            log.error("error is {}", e.getMessage());
+        }
+
+        //组装剩余数据
         //获取稿件上传时间
         String date = DateUtil.formatDate(request.getDate());
         String time = DateUtil.formatTime(request.getTime());
         DateTime dateTime = DateUtil.parse(date + " " + time);
-        manuscriptWithBLOBs.setSubmitTime(dateTime);
+        manuscript.setSubmitTime(dateTime);
+        manuscript.setFileName(ToolUtils.getYYYYMMddString() + "/" + filename);
         //将当前用户ID存储到userId
         if (UserContext.getUser() != null) {
             Long userId = UserContext.getUser();
-            manuscriptWithBLOBs.setUserId(userId);
+            manuscript.setUserId(userId);
         }
 
         //插入数据库
-        int result = manuscriptMapper.insertSelective(manuscriptWithBLOBs);
+        int result = manuscriptMapper.insertSelective(manuscript);
         //插入失败
         if (result != 1) {
-            log.info("插入数据失败：{}", manuscriptWithBLOBs);
+            log.info("插入数据失败：{}", manuscript);
             throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
         }
 
@@ -140,7 +159,7 @@ public class UploadManuscriptServiceImpl implements UploadManuscriptService {
         example.setOrderByClause("id desc limit 0,10");
         example.createCriteria().andIsDeleteEqualTo(CommonConstant.NO_DELETE)
                 .andUserIdEqualTo(UserContext.getUser());
-        List<Manuscript> manuscriptList = manuscriptMapper.selectByExample(example);
+        List<Manuscript> manuscriptList = manuscriptMapper.selectByExampleWithBLOBs(example);
         if (CollUtil.isEmpty(manuscriptList)) {
             return ResponseResult.okResult(new ArrayList<Manuscript>());
         } else {
@@ -152,6 +171,11 @@ public class UploadManuscriptServiceImpl implements UploadManuscriptService {
                 //给nickname赋值
                 manuscriptVo.setNickName(userInfo.getNickname());
                 manuscriptVoList.add(manuscriptVo);
+                //赋值审核状态
+                ManuscriptEnum manuscriptEnum = ManuscriptEnum.getUserEnum(manuscript.getStatus());
+                if (manuscriptEnum != null) {
+                    manuscriptVo.setStatus(manuscriptEnum.getName());
+                }
             });
             return ResponseResult.okResult(manuscriptVoList);
         }

@@ -41,7 +41,7 @@ public class UserController {
         return ResponseResult.okResult(result);
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     @ApiOperation(value = "用户推出")
     @Log(name = "用户退出模块")
     public ResponseResult login(HttpServletRequest request) {

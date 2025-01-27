@@ -38,6 +38,7 @@ public enum AppHttpCodeEnum {
     FILE_UPLOAD_AT_LEAST_TWO(1004,"至少上传两个文件"),
     FILE_SIZE_ERROR(1005,"文件大小不符合"),
     FILE_SUFFIX_ERROR(1006,"文件格式不符合！"),
+    FILE_NAME_IS_NOT_EMPTY(1007,"文件名称不能为空")
     ;
 
     int code;

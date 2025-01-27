@@ -11,6 +11,7 @@ import java.util.Date;
  */
 @Data
 public class ManuscriptVo {
+    private Integer id;
 
     /**
      *
@@ -20,6 +21,8 @@ public class ManuscriptVo {
      * @mbg.generated Tue Jan 21 19:55:46 CST 2025
      */
     private String title;
+
+    private String description;
 
     /**
      *
@@ -37,7 +40,7 @@ public class ManuscriptVo {
      *
      * @mbg.generated Tue Jan 21 19:55:46 CST 2025
      */
-    private Integer status;
+    private String status;
 
     /**
      *
@@ -47,5 +50,7 @@ public class ManuscriptVo {
      * @mbg.generated Tue Jan 21 19:55:46 CST 2025
      */
     private Date submitTime;
+
+    private String coverImg;
 
 }

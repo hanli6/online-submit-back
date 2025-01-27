@@ -37,7 +37,7 @@ public class UploadManuscriptController {
     @Log(name = "稿件查询模块")
     @GetMapping("/list")
     public ResponseResult listManuscript() {
-        return ResponseResult.okResult(uploadManuscriptService.listManuscripts());
+        return uploadManuscriptService.listManuscripts();
     }
 
 }

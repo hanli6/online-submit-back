@@ -20,6 +20,7 @@ file:
   upload:
     max: 2097152
     min: 1
+    path: E:/Code/online-submit/src/main/resources/upload/
   manuscript:
     suffix: pdf,doc,docx
   img:

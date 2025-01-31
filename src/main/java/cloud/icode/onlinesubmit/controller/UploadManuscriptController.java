@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -40,4 +41,10 @@ public class UploadManuscriptController {
         return uploadManuscriptService.listManuscripts();
     }
 
+    @ApiOperation(value = "稿件下载接口")
+    @Log(name = "稿件下载模块")
+    @GetMapping("/download")
+    public void downloadManuscript(HttpServletRequest request, HttpServletResponse response,@RequestParam("filename") String filename) {
+        uploadManuscriptService.downloadManuscript(request,response,filename);
+    }
 }

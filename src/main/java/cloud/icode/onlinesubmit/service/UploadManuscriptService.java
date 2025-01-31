@@ -5,6 +5,7 @@ import cloud.icode.onlinesubmit.model.dto.UploadManuscriptRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 作者: 杨振坤
@@ -26,4 +27,11 @@ public interface UploadManuscriptService {
      * @return
      */
     ResponseResult listManuscripts();
+
+    /**
+     * 稿件下载
+     * @param filename
+     * @param httpServletResponse
+     */
+    void downloadManuscript(HttpServletRequest request, HttpServletResponse httpServletResponse,String filename);
 }

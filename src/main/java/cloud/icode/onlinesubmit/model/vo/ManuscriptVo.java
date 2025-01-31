@@ -52,5 +52,6 @@ public class ManuscriptVo {
     private Date submitTime;
 
     private String coverImg;
+    private String fileName;
 
 }

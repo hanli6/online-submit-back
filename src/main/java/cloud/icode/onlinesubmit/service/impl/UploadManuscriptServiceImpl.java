@@ -13,6 +13,7 @@ import cloud.icode.onlinesubmit.model.vo.ManuscriptVo;
 import cloud.icode.onlinesubmit.model.vo.UserVo;
 import cloud.icode.onlinesubmit.service.UploadManuscriptService;
 import cloud.icode.onlinesubmit.service.UserService;
+import cloud.icode.onlinesubmit.utils.FileUtil;
 import cloud.icode.onlinesubmit.utils.ToolUtils;
 import cloud.icode.onlinesubmit.utils.UserContext;
 import cn.hutool.core.bean.BeanUtil;
@@ -20,6 +21,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,13 +100,13 @@ public class UploadManuscriptServiceImpl implements UploadManuscriptService {
         //获取文档名称
         String filename = null;
         if (multipartFile != null) {
-            filename = multipartFile.getOriginalFilename();
+            filename = IdUtil.simpleUUID() + multipartFile.getOriginalFilename();
         }
         if (StrUtil.isBlank(filename)) {
             throw new CustomException(AppHttpCodeEnum.FILE_NAME_IS_NOT_EMPTY);
         }
         //文件夹不存在就创建
-        File saveFile = new File(fileUploadPath+ToolUtils.getYYYYMMddString());
+        File saveFile = new File(fileUploadPath + ToolUtils.getYYYYMMddString());
         if (!saveFile.exists()) {
             saveFile.mkdir();
         }
@@ -179,6 +182,32 @@ public class UploadManuscriptServiceImpl implements UploadManuscriptService {
             });
             return ResponseResult.okResult(manuscriptVoList);
         }
+    }
+
+    /**
+     * 稿件下载
+     *
+     * @param filename
+     * @param httpServletResponse
+     */
+    @Override
+    public void downloadManuscript(HttpServletRequest request, HttpServletResponse httpServletResponse, String filename) {
+        if (StrUtil.isBlank(filename)) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        //下载文件
+        File file = new File(fileUploadPath + filename);
+        if(!file.exists()){
+            throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
+        }
+        boolean result = FileUtil.downloadFile(httpServletResponse, file);
+        if (!result) {
+            log.info("下载文档数据：{}失败！！！", filename);
+        }else {
+            log.info("下载文档数据：{}成功！！！", filename);
+        }
+
     }
 
     public static void main(String[] args) {
